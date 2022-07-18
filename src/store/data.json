@@ -1,0 +1,37 @@
+[
+  {
+    "id": 12345,
+    "eng": "Don't count on it",
+    "tn": "Не рассчитывайте на это"
+  },
+  {
+    "id":  12346,
+    "eng": "worth a shot",
+    "tn": "стоит попробовать"
+  },
+  {
+    "id":  12347,
+    "eng": "you wouldn't get beat up over it",
+    "tn": "ты бы не заморачивался по этому поводу"
+  },
+  {
+    "id":  12348,
+    "eng": "Guess who?",
+    "tn": "Угадай кто?"
+  },
+  {
+    "id":  12349,
+    "eng": "That's it, then?",
+    "tn": "Tо есть все?"
+  },
+  {
+    "id":  123410,
+    "eng": "Get to the point",
+    "tn": "Перейти к делу"
+  },
+  {
+    "id":  123411,
+    "eng": "Not many would do that",
+    "tn": "Не многие бы так сделали"
+  }
+]
