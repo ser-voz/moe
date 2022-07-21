@@ -24,19 +24,20 @@
                 </wort-item>
             </div>
         </template>
-        <div class="nothing" v-else>
+        <div class="nothing" v-if="vocabulary.length ===  0 && !preloader">
             Nothing here :(<br/>
             Click to "Add new"
         </div>
+        <preloader v-if="preloader"></preloader>
     </div>
     <modal-window v-model:show="modalVisible">
-        <h2 v-if="Object.keys(newWordFields.word).length !== 0">Edit</h2>
+        <h2 v-if="Object.keys(newWordFields.eng).length !== 0">Edit</h2>
         <h2 v-else>Add a new word</h2>
         <div>
             <h3>Word</h3>
-            <input required v-model="newWordFields.word"  type="text" placeholder="English word">
+            <input required v-model="newWordFields.eng"  type="text" placeholder="English word">
             <input required v-model="newWordFields.transcription" type="text" placeholder="Transcription">
-            <input required v-model="newWordFields.translation" type="text" placeholder="Translation">
+            <input required v-model="newWordFields.tn" type="text" placeholder="Translation">
             <div class="other_translation__input">
                 <input v-model="newWordFields.otherTranslation" type="text" placeholder="Other translation">
             </div>
@@ -63,18 +64,18 @@
         data() {
             return {
                 modalVisible: false,
+                preloader: true,
                 search: '',
                 isEdit: false,
                 newFields: [],
-                newWords: [],
                 newWordFields: {
-                    word: '',
+                    eng: '',
                     transcription: '',
-                    translation: '',
+                    tn: '',
                     otherTranslation: '',
                     sentences: []
                 },
-                vocabulary: []
+                vocabulary: [],
             }
         },
         methods: {
@@ -84,79 +85,93 @@
                     block: '<input id="en" type="text"  placeholder="english">' +
                         '<input id="tn" type="text" placeholder="translation">'
                 };
-
                 this.newFields.push(block);
             },
             addNewWord() {
-                if(this.newWordFields.word === '' || this.newWordFields.transcription === '' ||
-                    this.newWordFields.translation === '') return;
-                let sentencesNew = [];
+                //Check for required field
+                if(this.newWordFields.eng === '' || this.newWordFields.transcription === '' ||
+                    this.newWordFields.tn === '') return;
 
-                if(this.newFields.length > 0) {
+                //create arr and obj for new item and additional fields
+                let sentencesNew = [];
+                let item = {};
+
+                //check if was added additional fields and check for existing for add to item
+                if(this.newFields.length > 0 || this.newWordFields.sentences.length > 0) {
                     let sen =  document.querySelector('.sentences__content');
                     let divs = sen.querySelectorAll('div');
-
                     divs.forEach(function (item) {
                         let sen = {
                             en: item.children.en.value,
                             tn: item.children.tn.value,
                         };
                         if(sen.en !== '' && sen.tn !== '') sentencesNew.push(sen);
-
                     });
                 }
-                if(this.isEdit) {
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).word = this.newWordFields.word;
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).toggleItem = false;
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).transcription = this.newWordFields.transcription;
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).translation = this.newWordFields.translation;
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).otherTranslation = this.newWordFields.otherTranslation;
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).sentences = this.newWordFields.sentences;
 
-                    this.vocabulary.find(item => item.word === this.newWordFields.word).sentences = sentencesNew;
+                //Assign data
+                item = this.newWordFields;
+                item.sentences = sentencesNew;
 
-                    this.isEdit = false;
-                } else {
-                    const w = {
-                        toggleItem: false,
-                        word: this.newWordFields.word,
-                        transcription: this.newWordFields.transcription,
-                        translation: this.newWordFields.translation,
-                        otherTranslation: this.newWordFields.otherTranslation,
-                        sentences: sentencesNew,
-                    };
+                //Send data
+                this.createUpdateItem(item);
 
-                    this.vocabulary = [...this.vocabulary, w];
+                //Disable flag for editMode
+                if(this.isEdit) this.isEdit = false;
 
-                }
-                window.localStorage.setItem('words', JSON.stringify(this.vocabulary));
-
+                //Clear fields edit fields
+                item = {};
+                sentencesNew = [];
                 this.modalVisible = false;
-
-                this.newWordFields = {
-                    word: '',
-                    transcription: '',
-                    translation: '',
-                    otherTranslation: '',
-                    sentences: []
-                }
             },
 
-            deleteItem(item) {
-                this.vocabulary = this.vocabulary.filter((el) => el !== item);
-            },
             editItem(item) {
-                //console.log(item)
+                this.isEdit = true;
                 this.newWordFields = item;
                 if(item.sentences.length === 0) this.newFields.sentences = [];
-                this.isEdit = true;
-                //
-                // this.currentText.eng = item.eng;
-                // this.currentText.tn = item.tn;
-                //
                 this.modalVisible = true;
-            }
+            },
 
+            async deleteItem(item) {
+                //this.vocabulary = this.vocabulary.filter((el) => el !== item);
+                try {
+                    const response = await fetch(`http://localhost:8080/api/vocabulary/${item._id}`, {method: 'DELETE'});
+                    if (!response.ok) throw new Error('Ответ сети был не ok.');
+                    const json = await response.json();
+                    console.log('Успешно удалён ' + JSON.stringify(json));
+                    this.getItems();
+                } catch (e) {
+                    console.log(e.message)
+                }
+            },
+            async createUpdateItem(item) {
+                try {
+                    const response = await fetch('http://localhost:8080/api/vocabulary', {
+                        method: this.isEdit ? 'PUT' : 'POST',
+                        body: JSON.stringify(item),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    });
+                    if (!response.ok) throw new Error('Ответ сети был не ok.');
+                    const json = await response.json();
+                    console.log('Успешно добавлен/изменен '+ JSON.stringify(json));
+                    this.getItems();
+                } catch (e) {
+                    console.log(e.message);
+                }
+            },
+            async getItems() {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/vocabulary`);
+                    if (!response.ok) throw new Error('Ответ сети был не ok.');
+                    const data = await response.json();
+                    this.vocabulary = data.sort(() =>  Math.random() - 0.5);
+                    this.preloader = false;
+                } catch (e) {
+                    console.log(e.message)
+                }
+            }
         },
         computed: {
             oddWords() {
@@ -167,36 +182,29 @@
             },
             searchedItems() {
                 return [...this.vocabulary].filter(item =>
-                    this.search.match(/^[а-яА-Я]+$/) ? item.translation.toLowerCase().includes(this.search) :
-                        item.word.toLowerCase().includes(this.search)
+                    this.search.match(/^[а-яА-Я]+$/) ? item.tn.toLowerCase().includes(this.search) :
+                        item.eng.toLowerCase().includes(this.search)
                 );
             }
         },
         mounted() {
-            const localWords = JSON.parse(localStorage.getItem("words"));
-            if(localWords) this.vocabulary = localWords.sort(() =>  Math.random() - 0.5);
+            this.getItems();
         },
         watch: {
-            vocabulary() {
-                window.localStorage.setItem('words', JSON.stringify(this.vocabulary));
-            },
             modalVisible() {
                 if(this.modalVisible === false) {
                     this.isEdit = false;
                     this.newFields = [];
                     this.newWordFields = {
-                        word: '',
+                        eng: '',
                         transcription: '',
-                        translation: '',
+                        tn: '',
                         otherTranslation: '',
                         sentences: []
                     }
                 }
             }
-
         }
-
-
     }
 </script>
 

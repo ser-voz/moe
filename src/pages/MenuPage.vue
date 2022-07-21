@@ -6,6 +6,7 @@
             <router-link to="/verbs">Verbs</router-link>
             <router-link to="/sentence-phrases">Sentences and phrases</router-link>
             <router-link to="/grammar">Grammar</router-link>
+            <router-link to="/test">Test</router-link>
         </div>
     </div>
 </template>

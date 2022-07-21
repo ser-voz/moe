@@ -4,6 +4,7 @@ import IrregularVerbs from "@/pages/VerbsPage";
 import MenuPage from "@/pages/MenuPage";
 import SentencesPhrases from "@/pages/SentencesPhrases";
 import GrammarPage from "@/pages/GrammarPage";
+import TestPage from "@/pages/TestPage";
 
 
 const routes = [
@@ -27,6 +28,10 @@ const routes = [
         path: '/grammar',
         component: GrammarPage,
     },
+    {
+        path: '/test',
+        component: TestPage
+    }
 ];
 
 

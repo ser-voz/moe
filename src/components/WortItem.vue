@@ -2,12 +2,12 @@
     <div class="vocabulary__item">
         <div class="vocabulary__word">
             <div class="arrow-down"
-                 @click="data.toggleItem = !data.toggleItem"
-                 v-if="data.otherTranslation && data.sentences.length"
-                 :class="{ 'active': data.toggleItem }"></div>
-            <div class="en_word">{{ data.word }}</div>
+                 @click="$event.target.closest('.vocabulary__item').classList.toggle('opened')"
+                 v-if="data.otherTranslation && data.sentences.length">
+            </div>
+            <div class="en_word">{{ data.eng }}</div>
             <div>[ {{ data.transcription }} ]</div>
-            <div class="vocabulary__translate">{{ data.translation }}</div>
+            <div class="vocabulary__translate">{{ data.tn }}</div>
             <div class="vocabulary__item-more" >
                 <div>
                     <small @click="$emit('delete', data)">Delete</small>
@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="vocabulary__additional"
-             v-if="data.otherTranslation && data.sentences.length" v-show="data.toggleItem">
+             v-if="data.otherTranslation && data.sentences.length">
             <div class="other_translate">
                 <small>Other options:</small>
                 {{ data.otherTranslation }}
@@ -25,7 +25,7 @@
                 <small>Sentence:</small>
                 <ul>
                     <li  v-for="sentence in data.sentences" >
-                        <div v-html="boldWord(data.word, sentence.en)"></div>
+                        <div v-html="boldWord(data.eng, sentence.en)"></div>
                         <span>{{ sentence.tn }}</span>
                     </li>
                 </ul>
@@ -64,6 +64,7 @@
         border-radius: 5px;
         box-shadow: var(--boxshadow);
         position: relative;
+        max-width: 700px;
     }
     .vocabulary__word {
         display: grid;
@@ -107,17 +108,23 @@
         transform: rotate(45deg);
 
     }
-    .arrow-down.active:before {
+    .vocabulary__item.opened .arrow-down:before {
         transform: rotate(-135deg);
         top: calc(50% - 5px);
     }
     .en_word {
         font-weight: 600;
     }
+
     .vocabulary__additional {
         padding-top: 20px;
         font-size: 16px;
         padding-bottom: 10px;
+        display: none;
+    }
+
+    .vocabulary__item.opened .vocabulary__additional {
+        display: block;
     }
 
     .vocabulary__additional ul li:before {
@@ -212,4 +219,6 @@
         background-size: contain;
         opacity: 1;
     }
+
+
 </style>

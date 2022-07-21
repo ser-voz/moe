@@ -4,6 +4,7 @@
         <router-link to="/verbs">Verbs</router-link>
         <router-link to="/sentence-phrases">Sentences and phrases</router-link>
         <router-link to="/grammar">Grammar</router-link>
+        <router-link to="/test">Test</router-link>
     </div>
     <router-view></router-view>
 
@@ -15,11 +16,6 @@
 
     export default {
         components: {MenuPage},
-        data() {
-            return {
-                menuVisible: false
-            }
-        },
         computed: {
             menuVisible() {
                 return this.$route.path !== '/';
@@ -54,6 +50,10 @@
     }
     .darkMode table td {
         background: var(--white)!important;
+    }
+
+    .darkMode .vocabulary__additional b {
+        color: #e1e1e1 !important;
     }
 
     .darkMode button {

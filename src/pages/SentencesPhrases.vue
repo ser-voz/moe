@@ -13,22 +13,23 @@
                 <sentence-item v-for="item in evenSap" :data="item" @delete="deleteItem" @edit="editItem "></sentence-item>
             </div>
         </template>
-        <div class="nothing" v-else>
+        <div v-if="sap.length === 0 && !preloader" class="nothing">
             Nothing here :(<br/>
             Click to "Add new"
         </div>
+        <preloader v-if="preloader"></preloader>
     </div>
     <modal-window v-model:show="modalVisible">
-        <h2 v-if="Object.keys(isEdit).length !== 0">Edit</h2>
+        <h2 v-if="isEdit">Edit</h2>
         <h2 v-else>Add a new sentence or phrase</h2>
         <div>
             <h3>English</h3>
-            <input type="text" v-model="currentText.eng" placeholder="Enter text">
+            <input type="text" v-model="currentText.eng"
+                   placeholder="Enter text">
             <h3>Translation</h3>
             <input type="text" v-model="currentText.tn" placeholder="Enter translation">
         </div>
-        <main-button @click="addUpdate" class="btn-submit">submit</main-button>
-
+        <main-button @click="addAndUpdate" class="btn-submit">submit</main-button>
     </modal-window>
 </template>
 
@@ -40,7 +41,9 @@
         data() {
             return {
                 modalVisible: false,
-                isEdit: {},
+                error: false,
+                isEdit: false,
+                preloader: true,
                 currentText: {
                     eng: '',
                     tn:  ''
@@ -50,22 +53,12 @@
             }
         },
         methods: {
-            addUpdate() {
+            addAndUpdate() {
                 if(this.currentText.eng === '' || this.currentText.tn === '') return;
-                if(Object.keys(this.isEdit).length !== 0) {
-                    this.sap.find(item => item.id === this.isEdit.id).eng = this.currentText.eng;
-                    this.sap.find(item => item.id === this.isEdit.id).tn = this.currentText.tn;
-                    this.isEdit = {};
-                } else {
-                    const p = {
-                        id: Date.now(),
-                        eng: this.currentText.eng,
-                        tn: this.currentText.tn
-                    };
-                    this.sap = [...this.sap, p];
-                }
+                const item = this.currentText;
+                this.createUpdateItem(item);
 
-                window.localStorage.setItem('sap', JSON.stringify(this.sap));
+                if(this.isEdit) this.isEdit = false;
                 this.currentText = {
                     eng: '',
                     tn: ''
@@ -73,17 +66,49 @@
                 this.modalVisible = false;
             },
 
-            deleteItem(item) {
-               this.sap = this.sap.filter((el) => el !== item);
-            },
-
             editItem(item) {
-                this.isEdit = item;
-
-                this.currentText.eng = item.eng;
-                this.currentText.tn = item.tn;
+                this.isEdit = true;
+                this.currentText = item;
 
                 this.modalVisible = true;
+            },
+
+            async createUpdateItem(item) {
+                try {
+                    const response = await fetch('http://localhost:8080/api/phrases', {
+                        method: this.isEdit ? 'PUT' : 'POST',
+                        body: JSON.stringify(item),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    });
+                    if(!response.ok) throw new Error('Ответ сети был не ok.');
+                    this.getItems()
+                } catch (e) {
+                    console.log(e.message)
+                }
+            },
+
+            async deleteItem(item) {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/phrases/${item._id}`, {method: 'DELETE',});
+                    if(!response.ok) throw new Error('Ответ сети был не ok.');
+                    this.getItems();
+                } catch (e) {
+                    console.log(e.message)
+                }
+            },
+
+            async getItems() {
+                try {
+                    const response = await fetch('http://localhost:8080/api/phrases');
+                    if(!response.ok) throw new Error('Ответ сети был не ok.')
+                    const data = await response.json();
+                    this.sap = data.sort(() =>  Math.random() - 0.5);
+                    this.preloader = false;
+                } catch (e) {
+                    console.log(e.message)
+                }
             }
         },
 
@@ -91,11 +116,9 @@
             oddSap() {
                 return [...this.searchedItems].filter((item, index) => index % 2 === 0);
             },
-
             evenSap() {
                 return [...this.searchedItems].filter((item, index) => index % 2 === 1);
             },
-
             searchedItems() {
                 return [...this.sap].filter(item =>
                     this.search.match(/^[а-яА-Я]+$/) ? item.tn.toLowerCase().includes(this.search) :
@@ -105,26 +128,10 @@
         },
 
         mounted() {
-            const localSap = JSON.parse(localStorage.getItem("sap"));
-            if(localSap) this.sap = localSap.sort(() => 0.5 - Math.random());
-            /*
-            function shuffle(arr){
-                let j, temp;
-                for(var i = arr.length - 1; i > 0; i--){
-                    j = Math.floor(Math.random()*(i + 1));
-                    temp = arr[j];
-                    arr[j] = arr[i];
-                    arr[i] = temp;
-                }
-                return arr;
-            }
-            */
+            this.getItems();
         },
 
         watch: {
-            sap() {
-                window.localStorage.setItem('sap', JSON.stringify(this.sap));
-            },
             modalVisible() {
                 if(this.modalVisible === false) {
                     this.isEdit = {};
