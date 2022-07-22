@@ -103,6 +103,10 @@
         opacity: .4;
     }
 
+    .darkMode .lds-ring div {
+        border-color: #fff transparent transparent transparent;
+    }
+
     .main-menu {
         position: absolute;
         width: 100%;
