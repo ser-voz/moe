@@ -1,6 +1,6 @@
 # moe
 
-<a href="https://ser-voz.github.io/moe/">Check it here</a>
+<a href="https://ser-voz.github.io/moe/" target="_blank">Check it here</a>
 
 ## Project setup
 ```
