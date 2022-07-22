@@ -76,6 +76,7 @@
                     sentences: []
                 },
                 vocabulary: [],
+                url: 'http://localhost:8080'
             }
         },
         methods: {
@@ -116,6 +117,8 @@
                 //Send data
                 this.createUpdateItem(item);
 
+                //If server is not responding then push new item in store
+                this.isEdit ? this.$store.commit('CHANGE_VOC', item) : this.$store.commit('ADD_VOC', item);
                 //Disable flag for editMode
                 if(this.isEdit) this.isEdit = false;
 
@@ -133,20 +136,22 @@
             },
 
             async deleteItem(item) {
-                //this.vocabulary = this.vocabulary.filter((el) => el !== item);
                 try {
-                    const response = await fetch(`http://localhost:8080/api/vocabulary/${item._id}`, {method: 'DELETE'});
+                    const response = await fetch(`${this.url}/api/vocabulary/${item._id}`, {method: 'DELETE'});
                     if (!response.ok) throw new Error('Ответ сети был не ok.');
                     const json = await response.json();
                     console.log('Успешно удалён ' + JSON.stringify(json));
                     this.getItems();
                 } catch (e) {
+                    //If server is not responding then delete item in store
+                    this.$store.commit('DELETE_VOC', item);
+
                     console.log(e.message)
                 }
             },
             async createUpdateItem(item) {
                 try {
-                    const response = await fetch('http://localhost:8080/api/vocabulary', {
+                    const response = await fetch(`${this.url}/api/vocabulary`, {
                         method: this.isEdit ? 'PUT' : 'POST',
                         body: JSON.stringify(item),
                         headers: {
@@ -163,13 +168,18 @@
             },
             async getItems() {
                 try {
-                    const response = await fetch(`http://localhost:8080/api/vocabulary`);
+                    const response = await fetch(`${this.url}/api/vocabulary`);
                     if (!response.ok) throw new Error('Ответ сети был не ok.');
                     const data = await response.json();
                     this.vocabulary = data.sort(() =>  Math.random() - 0.5);
                     this.preloader = false;
                 } catch (e) {
+                    // If server is not responding then get data from store
+                    const data = this.$store.getters.VOC;
+                    this.vocabulary = data;
+                    this.preloader = false;
                     console.log(e.message)
+
                 }
             }
         },
@@ -185,7 +195,8 @@
                     this.search.match(/^[а-яА-Я]+$/) ? item.tn.toLowerCase().includes(this.search) :
                         item.eng.toLowerCase().includes(this.search)
                 );
-            }
+            },
+
         },
         mounted() {
             this.getItems();

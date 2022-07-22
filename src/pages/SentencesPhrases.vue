@@ -50,6 +50,7 @@
                 },
                 search: '',
                 sap: [],
+                url: 'http://localhost:8080'
             }
         },
         methods: {
@@ -58,6 +59,9 @@
                 const item = this.currentText;
                 this.createUpdateItem(item);
 
+                //If server is not responding then push new item in store
+                this.isEdit ? this.$store.commit('CHANGE_SAP', item) : this.$store.commit('ADD_SAP', item);
+                //Disable flag for editMode
                 if(this.isEdit) this.isEdit = false;
                 this.currentText = {
                     eng: '',
@@ -75,7 +79,7 @@
 
             async createUpdateItem(item) {
                 try {
-                    const response = await fetch('http://localhost:8080/api/phrases', {
+                    const response = await fetch(`${this.url}/api/phrases`, {
                         method: this.isEdit ? 'PUT' : 'POST',
                         body: JSON.stringify(item),
                         headers: {
@@ -91,22 +95,28 @@
 
             async deleteItem(item) {
                 try {
-                    const response = await fetch(`http://localhost:8080/api/phrases/${item._id}`, {method: 'DELETE',});
+                    const response = await fetch(`${this.url}/api/phrases/${item._id}`, {method: 'DELETE',});
                     if(!response.ok) throw new Error('Ответ сети был не ok.');
                     this.getItems();
                 } catch (e) {
+                    //If server is not responding then delete item in store
+                    this.$store.commit('DELETE_SAP', item);
                     console.log(e.message)
                 }
             },
 
             async getItems() {
                 try {
-                    const response = await fetch('http://localhost:8080/api/phrases');
+                    const response = await fetch(`${this.url}/api/phrases`);
                     if(!response.ok) throw new Error('Ответ сети был не ok.')
                     const data = await response.json();
                     this.sap = data.sort(() =>  Math.random() - 0.5);
                     this.preloader = false;
                 } catch (e) {
+                    // If server is not responding then get data from store
+                    const data = this.$store.getters.SAP;
+                    this.sap = data;
+                    this.preloader = false;
                     console.log(e.message)
                 }
             }

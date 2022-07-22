@@ -45,6 +45,7 @@
                 right: 0,
                 wrong: 0,
                 answer: '',
+                url: 'http://localhost:8080'
             }
         },
         methods: {
@@ -58,7 +59,7 @@
                 this.preloaderStatus = true;
                 this.testEnable = true;
                 try {
-                    const response = await fetch(`http://localhost:8080/api/${items}`);
+                    const response = await fetch(`${this.url}/api/${items}`);
                     const resp = await response.json();
                     if(!response.ok) throw new Error('Ответ сети был не ok.');
                     let arr = [];
@@ -77,6 +78,25 @@
                         this.testStart = true;
                     }
                 } catch (e) {
+                    // If server is not responding then get data from store
+                    const data = items === 'phrases' ? this.$store.getters.SAP : this.$store.getters.VOC;
+                    this.preloaderStatus = false;
+                    let arr = [];
+                    if(data.length < 5) {
+                        this.error = true;
+                    } else {
+                        data.map((item) => {
+                            let elem = {
+                                en: item.eng,
+                                tn: item.tn,
+                            };
+                            arr = [...arr, elem];
+                        });
+                        this.testItems = arr.sort(() => 0.5 - Math.random());
+                        this.testStart = true;
+                    }
+
+
                     console.log(e.message)
                 }
             },
