@@ -104,7 +104,7 @@
     }
 
     .darkMode .lds-ring div {
-        border-color: #fff transparent transparent transparent;
+        border-color: #fff transparent transparent transparent!important;
     }
 
     .main-menu {

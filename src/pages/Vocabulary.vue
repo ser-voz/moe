@@ -3,7 +3,7 @@
 
     <div class="vocabulary">
         <div class="add-search">
-            <main-button @click="modalVisible = !modalVisible">Add new</main-button>
+            <main-button @click="modalVisible = !modalVisible, isEdit = false">Add new</main-button>
             <input type="text" v-model="search" placeholder="Search...">
         </div>
         <template v-if="vocabulary.length > 0">
@@ -31,7 +31,7 @@
         <preloader v-if="preloader"></preloader>
     </div>
     <modal-window v-model:show="modalVisible">
-        <h2 v-if="Object.keys(newWordFields.eng).length !== 0">Edit</h2>
+        <h2 v-if="isEdit">Edit</h2>
         <h2 v-else>Add a new word</h2>
         <div>
             <h3>Word</h3>
@@ -58,6 +58,7 @@
 
 <script>
     import WortItem from "../components/WortItem";
+
     export default {
         name: "Vocabulary",
         components: {WortItem},
@@ -76,7 +77,7 @@
                     sentences: []
                 },
                 vocabulary: [],
-                url: 'http://localhost:8080'
+                url: 'http://localhost:8080/api/vocabulary/'
             }
         },
         methods: {
@@ -117,11 +118,6 @@
                 //Send data
                 this.createUpdateItem(item);
 
-                //If server is not responding then push new item in store
-                this.isEdit ? this.$store.commit('CHANGE_VOC', item) : this.$store.commit('ADD_VOC', item);
-                //Disable flag for editMode
-                if(this.isEdit) this.isEdit = false;
-
                 //Clear fields edit fields
                 item = {};
                 sentencesNew = [];
@@ -137,28 +133,35 @@
 
             async deleteItem(item) {
                 try {
-                    const response = await fetch(`${this.url}/api/vocabulary/${item._id}`, {method: 'DELETE'});
-                    if (!response.ok) throw new Error('Ответ сети был не ok.');
+                    const response = await fetch(`${this.url}${item._id}`, {method: 'DELETE'});
+                    if (!response.ok) {
+                        //If server is not responding then delete item in store
+                        this.$store.commit('DELETE_VOC', item);
+                        throw new Error('Network response was not ok.')
+                    }
                     const json = await response.json();
                     console.log('Успешно удалён ' + JSON.stringify(json));
                     this.getItems();
                 } catch (e) {
-                    //If server is not responding then delete item in store
-                    this.$store.commit('DELETE_VOC', item);
-
                     console.log(e.message)
                 }
             },
             async createUpdateItem(item) {
                 try {
-                    const response = await fetch(`${this.url}/api/vocabulary`, {
+                    const response = await fetch(`${this.url}`, {
                         method: this.isEdit ? 'PUT' : 'POST',
                         body: JSON.stringify(item),
                         headers: {
                             'Content-Type': 'application/json'
                         },
                     });
-                    if (!response.ok) throw new Error('Ответ сети был не ok.');
+                    if (!response.ok) {
+                        //If server is not responding then push new item in store
+                        this.isEdit ? this.$store.commit('CHANGE_VOC', item) : this.$store.commit('ADD_VOC', item);
+                        this.isEdit = false;
+
+                        throw new Error('Network response was not ok.')
+                    }
                     const json = await response.json();
                     console.log('Успешно добавлен/изменен '+ JSON.stringify(json));
                     this.getItems();
@@ -166,22 +169,27 @@
                     console.log(e.message);
                 }
             },
+
             async getItems() {
                 try {
-                    const response = await fetch(`${this.url}/api/vocabulary`);
-                    if (!response.ok) throw new Error('Ответ сети был не ok.');
+                    const response = await fetch(`${this.url}`);
+                    if (!response.ok) {
+                        // If server is not responding then get data from store
+                        const data = this.$store.getters.VOC;
+                        this.vocabulary = data;
+                        this.preloader = false;
+                        throw new Error('Network response was not ok.')
+                    }
                     const data = await response.json();
                     this.vocabulary = data.sort(() =>  Math.random() - 0.5);
                     this.preloader = false;
                 } catch (e) {
-                    // If server is not responding then get data from store
-                    const data = this.$store.getters.VOC;
-                    this.vocabulary = data;
-                    this.preloader = false;
                     console.log(e.message)
 
                 }
             }
+
+
         },
         computed: {
             oddWords() {
@@ -198,13 +206,13 @@
             },
 
         },
+
         mounted() {
             this.getItems();
         },
         watch: {
             modalVisible() {
                 if(this.modalVisible === false) {
-                    this.isEdit = false;
                     this.newFields = [];
                     this.newWordFields = {
                         eng: '',
