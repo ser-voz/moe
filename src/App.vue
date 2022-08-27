@@ -12,7 +12,7 @@
 </template>
 <script>
     import '@/assets/style.module.css'
-    import MenuPage from "./pages/MenuPage";
+    import MenuPage from "./views/MenuPage";
 
     export default {
         components: {MenuPage},

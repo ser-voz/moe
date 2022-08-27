@@ -31,8 +31,18 @@
 </template>
 
 <script>
+    import {vocStore} from "@/store/vocabulary";
+    import {senStore} from "@/store/sentences";
+
     export default {
         name: "TestPage",
+
+        setup() {
+            const voc = vocStore().list;
+            const sen = senStore().list;
+
+            return {voc, sen}
+        },
         data() {
             return {
                 testEnable: false,
@@ -55,49 +65,23 @@
             phrasesTest() {
                 this.getItemsForTest('phrases');
             },
-            async getItemsForTest(items){
-                this.preloaderStatus = true;
-                this.testEnable = true;
-                try {
-                    const response = await fetch(`${this.url}/api/${items}`);
-                    const resp = await response.json();
-                    if(!response.ok) throw new Error('Ответ сети был не ok.');
-                    let arr = [];
-                    this.preloaderStatus = false;
-                    if(resp.length < 5) {
-                        this.error = true;
-                    } else {
-                        resp.map((item) => {
-                            let elem = {
-                                en: item.eng,
-                                tn: item.tn,
-                            };
-                            arr = [...arr, elem];
-                        });
-                        this.testItems = arr.sort(() => 0.5 - Math.random());
-                        this.testStart = true;
-                    }
-                } catch (e) {
-                    // If server is not responding then get data from store
-                    const data = items === 'phrases' ? this.$store.getters.SAP : this.$store.getters.VOC;
-                    this.preloaderStatus = false;
-                    let arr = [];
-                    if(data.length < 5) {
-                        this.error = true;
-                    } else {
-                        data.map((item) => {
-                            let elem = {
-                                en: item.eng,
-                                tn: item.tn,
-                            };
-                            arr = [...arr, elem];
-                        });
-                        this.testItems = arr.sort(() => 0.5 - Math.random());
-                        this.testStart = true;
-                    }
-
-
-                    console.log(e.message)
+            getItemsForTest(items) {
+                const data = items === 'phrases' ? this.sen : this.voc
+                let arr = [];
+                if (data.length < 5) {
+                    this.testEnable = true;
+                    this.error = true;
+                } else {
+                    this.testEnable = true;
+                    data.map((item) => {
+                        let elem = {
+                            en: item.eng,
+                            tn: item.tn,
+                        };
+                        arr = [...arr, elem];
+                    });
+                    this.testItems = arr.sort(() => 0.5 - Math.random());
+                    this.testStart = true;
                 }
             },
             nextItem(ans) {

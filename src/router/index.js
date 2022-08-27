@@ -1,10 +1,10 @@
-import Vocabulary from "@/pages/Vocabulary";
+import Vocabulary from "@/views/Vocabulary";
 import {createRouter, createWebHistory} from "vue-router";
-import IrregularVerbs from "@/pages/VerbsPage";
-import MenuPage from "@/pages/MenuPage";
-import SentencesPhrases from "@/pages/SentencesPhrases";
-import GrammarPage from "@/pages/GrammarPage";
-import TestPage from "@/pages/TestPage";
+import IrregularVerbs from "@/views/VerbsPage";
+import MenuPage from "@/views/MenuPage";
+import SentencesPhrases from "@/views/SentencesPhrases";
+import GrammarPage from "@/views/GrammarPage";
+import TestPage from "@/views/TestPage";
 
 
 const routes = [

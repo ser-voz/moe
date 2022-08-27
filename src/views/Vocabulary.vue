@@ -2,14 +2,15 @@
     <h1>Vocabulary</h1>
 
     <div class="vocabulary">
-        <div class="add-search">
-            <main-button @click="modalVisible = !modalVisible, isEdit = false">Add new</main-button>
-            <input type="text" v-model="search" placeholder="Search...">
-        </div>
-        <template v-if="vocabulary.length > 0">
+        <template v-if="!preloader && store.list.length > 0">
+            <div class="add-search">
+                <main-button @click="modalVisible = !modalVisible, isEdit = false">Add new</main-button>
+                <input type="text" v-model="store.search" placeholder="Search...">
+            </div>
+
             <div class="vocabulary__list">
                 <wort-item
-                        v-for="item in oddWords"
+                        v-for="item in store.oddItems"
                         :data="item"
                         @delete="deleteItem" @edit="editItem"
                 >
@@ -17,14 +18,14 @@
             </div>
             <div class="vocabulary__list">
                 <wort-item
-                        v-for="item in evenWords"
+                        v-for="item in store.evenItems"
                         :data="item"
                         @delete="deleteItem" @edit="editItem"
                 >
                 </wort-item>
             </div>
         </template>
-        <div class="nothing" v-if="vocabulary.length ===  0 && !preloader">
+        <div class="nothing" v-if="!store.list.length && !preloader">
             Nothing here :(<br/>
             Click to "Add new"
         </div>
@@ -58,15 +59,23 @@
 
 <script>
     import WortItem from "../components/WortItem";
+    import { vocStore } from '@/store/vocabulary'
 
     export default {
         name: "Vocabulary",
         components: {WortItem},
+
+        setup() {
+            const store = vocStore();
+            store.$subscribe((mutation, state) => {
+                localStorage.setItem('vocabulary', JSON.stringify(state.list))
+            })
+            return {store}
+        },
         data() {
             return {
                 modalVisible: false,
                 preloader: true,
-                search: '',
                 isEdit: false,
                 newFields: [],
                 newWordFields: {
@@ -76,8 +85,6 @@
                     otherTranslation: '',
                     sentences: []
                 },
-                vocabulary: [],
-                url: 'http://localhost:8080/api/vocabulary/'
             }
         },
         methods: {
@@ -131,84 +138,18 @@
                 this.modalVisible = true;
             },
 
-            async deleteItem(item) {
-                try {
-                    const response = await fetch(`${this.url}${item._id}`, {method: 'DELETE'});
-                    if (!response.ok) {
-                        //If server is not responding then delete item in store
-                        this.$store.commit('DELETE_VOC', item);
-                        throw new Error('Network response was not ok.')
-                    }
-                    const json = await response.json();
-                    console.log('Успешно удалён ' + JSON.stringify(json));
-                    this.getItems();
-                } catch (e) {
-                    console.log(e.message)
-                }
+            deleteItem(item) {
+                this.store.delete(item);
             },
-            async createUpdateItem(item) {
-                try {
-                    const response = await fetch(`${this.url}`, {
-                        method: this.isEdit ? 'PUT' : 'POST',
-                        body: JSON.stringify(item),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                    });
-                    if (!response.ok) {
-                        //If server is not responding then push new item in store
-                        this.isEdit ? this.$store.commit('CHANGE_VOC', item) : this.$store.commit('ADD_VOC', item);
-                        this.isEdit = false;
-
-                        throw new Error('Network response was not ok.')
-                    }
-                    const json = await response.json();
-                    console.log('Успешно добавлен/изменен '+ JSON.stringify(json));
-                    this.getItems();
-                } catch (e) {
-                    console.log(e.message);
-                }
-            },
-
-            async getItems() {
-                try {
-                    const response = await fetch(`${this.url}`);
-                    if (!response.ok) {
-                        // If server is not responding then get data from store
-                        const data = this.$store.getters.VOC;
-                        this.vocabulary = data;
-                        this.preloader = false;
-                        throw new Error('Network response was not ok.')
-                    }
-                    const data = await response.json();
-                    this.vocabulary = data.sort(() =>  Math.random() - 0.5);
-                    this.preloader = false;
-                } catch (e) {
-                    console.log(e.message)
-
-                }
-            }
-
-
-        },
-        computed: {
-            oddWords() {
-                return [...this.searchedItems].filter((item, index) => index % 2 === 0);
-            },
-            evenWords() {
-                return [...this.searchedItems].filter((item, index) => index % 2 === 1);
-            },
-            searchedItems() {
-                return [...this.vocabulary].filter(item =>
-                    this.search.match(/^[а-яА-Я]+$/) ? item.tn.toLowerCase().includes(this.search) :
-                        item.eng.toLowerCase().includes(this.search)
-                );
+            createUpdateItem(item) {
+                this.isEdit ? this.store.update(item) : this.store.create(item);
+                this.isEdit = false;
             },
 
         },
-
         mounted() {
-            this.getItems();
+            this.store.getFromLocal();
+            this.preloader = false;
         },
         watch: {
             modalVisible() {
@@ -222,7 +163,7 @@
                         sentences: []
                     }
                 }
-            }
+            },
         }
     }
 </script>
