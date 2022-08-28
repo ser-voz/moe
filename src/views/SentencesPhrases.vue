@@ -46,6 +46,7 @@
 <script>
     import SentenceItem from "../components/SentenceItem";
     import {senStore} from "@/store/sentences";
+    import {authStore} from "@/store/auth";
 
     export default {
         name: "SentencesPhrases",
@@ -53,11 +54,13 @@
 
         setup() {
             const store = senStore();
-            store.$subscribe((mutation, state) => {
-                localStorage.setItem('sentences', JSON.stringify(state.list))
-            });
-
-            return {store}
+            const authStatus = authStore().auth;
+            if(authStatus) {
+                store.$subscribe((mutation, state) => {
+                    localStorage.setItem('sentences', JSON.stringify(state.list))
+                });
+            }
+            return {store, authStatus}
         },
         data() {
             return {
@@ -100,7 +103,7 @@
             },
         },
         mounted() {
-            this.store.getFromLocal();
+            this.store.getItems(this.authStatus);
             this.preloader = false;
         },
         watch: {

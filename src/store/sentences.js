@@ -4,7 +4,8 @@ import getters from "@/store/getters/getters";
 export const senStore = defineStore('sentences', {
     state: () => {
         return {
-            list: [
+            list: [],
+            default: [
                 {
                     _id: "62d96d957b4daa2bc6664ca0",
                     eng: "Not many would do that",
@@ -61,8 +62,9 @@ export const senStore = defineStore('sentences', {
     },
     getters,
     actions: {
-        getFromLocal() {
-            this.list = JSON.parse(localStorage.getItem('sentences'));
+        getItems(auth) {
+            const local = JSON.parse(localStorage.getItem('sentences'));
+            !auth || !local || local.length === 0 ? this.list = this.default : this.list = local;
         },
         create(item) {
             item._id = Date.now();

@@ -60,6 +60,8 @@
 <script>
     import WortItem from "../components/WortItem";
     import { vocStore } from '@/store/vocabulary'
+    import { authStore } from "@/store/auth";
+
 
     export default {
         name: "Vocabulary",
@@ -67,10 +69,13 @@
 
         setup() {
             const store = vocStore();
-            store.$subscribe((mutation, state) => {
-                localStorage.setItem('vocabulary', JSON.stringify(state.list))
-            })
-            return {store}
+            const authStatus = authStore().auth;
+            if(authStatus) {
+                store.$subscribe((mutation, state) => {
+                    localStorage.setItem('vocabulary', JSON.stringify(state.list))
+                })
+            }
+            return {store, authStatus}
         },
         data() {
             return {
@@ -148,7 +153,7 @@
 
         },
         mounted() {
-            this.store.getFromLocal();
+            this.store.getFromLocal(this.authStatus);
             this.preloader = false;
         },
         watch: {

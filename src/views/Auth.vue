@@ -37,7 +37,7 @@ export default {
         localSignUp() {
             if (this.user.name === '') return;
             if (this.user.remember) {
-                this.store.setCookie('user', `${this.user.name}`, {secure: true, 'max-age': 2147483647});
+                this.store.setCookie('user', `${this.user.name}`, {secure: false, 'max-age': 2147483647});
                 this.store.setLocal(this.user.name);
                 window.location.href = '/';
             }

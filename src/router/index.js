@@ -5,10 +5,12 @@ import MenuPage from "@/views/MenuPage";
 import SentencesPhrases from "@/views/SentencesPhrases";
 import GrammarPage from "@/views/GrammarPage";
 import TestPage from "@/views/TestPage";
+import Auth from "@/views/Auth";
 
 
 const routes = [
     {
+        name: 'home',
         path: '/',
         component: MenuPage
     },
@@ -31,6 +33,11 @@ const routes = [
     {
         path: '/test',
         component: TestPage
+    },
+    {
+        name: 'auth',
+        path: '/sign-up',
+        component: Auth
     }
 ];
 

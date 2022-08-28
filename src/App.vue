@@ -5,22 +5,41 @@
         <router-link to="/sentence-phrases">Sentences and phrases</router-link>
         <router-link to="/grammar">Grammar</router-link>
         <router-link to="/test">Test</router-link>
+        <router-link :to="{name: 'auth'}" class="log-in-btn" v-if="!getUser.name">Sign up</router-link>
+        <h3 class="auth-name" v-if="getUser.name">🖐Hello {{getUser.name}} <span v-if="getUser.auth" @click="logOut" title="Log out and clear local storage" class="log-out"></span></h3>
     </div>
     <router-view></router-view>
 
     <switch-mode></switch-mode>
 </template>
 <script>
+    import {authStore} from "@/store/auth";
     import '@/assets/style.module.css'
     import MenuPage from "./views/MenuPage";
 
+
     export default {
         components: {MenuPage},
+        setup() {
+            const getUser = authStore();
+            getUser.getCookie();
+            return {getUser};
+        },
         computed: {
             menuVisible() {
                 return this.$route.path !== '/';
             },
         },
+        methods: {
+            logOut() {
+                localStorage.removeItem('vocabulary');
+                localStorage.removeItem('sentences');
+                this.getUser.setCookie('user', '', {
+                    'max-age': -1
+                });
+                window.location.href = '/';
+            }
+        }
     }
 </script>
 <style>
@@ -69,9 +88,24 @@
         color: var(--black);
     }
 
+    .main-menu .log-in-btn {
+        background: none!important;
+        border: none;
+        cursor: pointer;
+        text-decoration: underline;
+        position: absolute;
+        right: 50px;
+    }
+
     .darkMode .sentences__add-field,
     .darkMode .modal__close {
         filter: invert(1);
+    }
+
+    .auth-name {
+        position: absolute;
+        right: 50px;
+        top: -85%;
     }
 
     .darkMode input:focus {
@@ -115,7 +149,8 @@
         background: var(--white);
     }
 
-    .main-menu a {
+    .main-menu a,
+    .main-menu button {
         margin: 0 10px;
         font-size: 18px;
         font-weight: 500;
@@ -145,5 +180,20 @@
         font-weight: 700;
         text-transform: uppercase;
         margin-top: 100px;
+    }
+
+    .log-out {
+        background: url("assets/img/logout-dark.svg")center no-repeat;
+        background-size: contain;
+        width: 15px;
+        height: 15px;
+        display: inline-block;
+        filter: brightness(1);
+        vert-align: middle;
+        cursor: pointer;
+        margin-left: 10px;
+    }
+    .darkMode .log-out {
+        background: url("assets/img/logout-ligth.svg")center no-repeat;
     }
 </style>

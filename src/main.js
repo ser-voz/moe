@@ -15,3 +15,4 @@ components.forEach(component => {
 
 app.use(pinia).use(router).mount('#app');
 
+

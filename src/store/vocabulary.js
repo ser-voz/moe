@@ -4,7 +4,8 @@ import getters from "@/store/getters/getters";
 export const vocStore = defineStore('vocabulary', {
     state: () => {
         return {
-            list: [
+            list: [],
+            default: [
                 {
                     _id: "62d8482f83029dd889c18db6",
                     eng: "obviously",
@@ -176,8 +177,9 @@ export const vocStore = defineStore('vocabulary', {
     },
     getters,
     actions: {
-        getFromLocal() {
-            this.list = JSON.parse(localStorage.getItem('vocabulary'));
+        getFromLocal(auth) {
+            const local = JSON.parse(localStorage.getItem('vocabulary'));
+            !auth || !local || local.length === 0 ? this.list = this.default : this.list = local;
         },
         create(item) {
             item._id = Date.now();

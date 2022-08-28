@@ -55,7 +55,6 @@
                 right: 0,
                 wrong: 0,
                 answer: '',
-                url: 'http://localhost:8080'
             }
         },
         methods: {

@@ -14,11 +14,6 @@
     background: var(--white);
 }
 
-
-
-
-
-
 *, :before, :after {
     box-sizing: border-box;
 }
@@ -71,7 +66,7 @@ p {
 
 
 
-input {
+input[type=text] {
     border: 1px solid var(--grey);
     border-radius: 3px;
     padding: 7px 10px;
@@ -81,6 +76,10 @@ input {
     display: block;
     width: 100%;
     margin-bottom: 5px;
+}
+
+label {
+    cursor: pointer;
 }
 
 
