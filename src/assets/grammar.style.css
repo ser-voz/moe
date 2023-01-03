@@ -72,10 +72,10 @@ ul li {
     width: 5%;
 }
 .ec-table thead tr th:nth-child(5) {
-    width: 16%;
+    width: 19%;
 }
 .ec-table thead tr th:nth-child(6) {
-    width: 25%;
+    width: 22%;
 }
 .ec-table tbody tr:nth-last-child(-n+2) th {
     border-bottom: none;
@@ -137,4 +137,37 @@ ul li {
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
+}
+.green {
+    color: #129b50;
+    margin-left: 5px;
+}
+
+.examples {
+    max-width: 1400px;
+    margin: 20px auto;
+    font-size: 16px;
+    display: flex;
+    flex-wrap: wrap
+}
+
+.examples ol {
+    margin-left: 0;
+    padding-left: 17px;
+    font-size: 18px;
+    font-weight: 500;
+}
+.examples li {
+    margin-bottom: 15px;
+}
+.examples div {
+    flex: 1 1 50%;
+}
+.examples h2 {
+    text-align: left;
+    flex: 1 1 100%;
+}
+.examples small {
+    font-size: 16px;
+    font-style: italic;
 }

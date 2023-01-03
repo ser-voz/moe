@@ -6,7 +6,10 @@
                  v-if="data.otherTranslation && data.sentences.length">
             </div>
             <div class="en_word">{{ data.eng }}</div>
-            <div>[ {{ data.transcription }} ]</div>
+            <div class="transcription">
+                <sound-btn @click="speechWord(data.eng)"/>
+                <div v-if="data.transcription !== ''">[ {{ data.transcription }} ]</div>
+            </div>
             <div class="vocabulary__translate">{{ data.tn }}</div>
             <div class="vocabulary__item-more" >
                 <div>
@@ -14,6 +17,7 @@
                     <small @click="$emit('edit', data)">Edit</small>
                 </div>
             </div>
+
         </div>
         <div class="vocabulary__additional"
              v-if="data.otherTranslation && data.sentences.length">
@@ -47,11 +51,24 @@
             boldWord(word, str) {
                 return str.replace(word, `<b>${word}</b>`);
             },
+            speechWord(val) {
+                const speech = new SpeechSynthesisUtterance();
+                speech.lang = 'en-En';
+                speech.volume = 2;
+                speech.text = val;
+                window.speechSynthesis.speak(speech);
+            }
         }
     }
 </script>
 
 <style scoped>
+    .transcription {
+        display: flex;
+        align-items: center;
+    }
+
+
     .vocabulary__item {
         font-size: 24px;
         font-weight: 500;
@@ -66,6 +83,12 @@
         position: relative;
         max-width: 700px;
     }
+    @media screen and (max-width: 1440px) {
+        .vocabulary__item {
+            min-width: 630px;
+        }
+    }
+
     .vocabulary__word {
         display: grid;
         grid-template-columns:  repeat(2, 1fr) 50px;

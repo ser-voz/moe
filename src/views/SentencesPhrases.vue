@@ -1,9 +1,10 @@
 <template>
-    <h1>Sentences and phrases</h1>
+    <h1 v-scroll="138">Sentences and phrases</h1>
     <div class="sap">
         <template v-if="!preloader">
-            <div class="add-search">
+            <div class="add-search" v-scroll="220">
                 <main-button @click="modalVisible = !modalVisible, isEdit = false">Add new</main-button>
+                <main-button @click="store.downloadData(store.list, store.$id)" class="download">Download</main-button>
                 <input type="text" v-model="store.search" placeholder="Search...">
             </div>
             <div class="sap__list">
@@ -34,10 +35,15 @@
         <h2 v-else>Add a new sentence or phrase</h2>
         <div>
             <h3>English</h3>
-            <input type="text" v-model="currentText.eng"
+            <input type="text"
+                   :class="{'error': error && currentText.eng === ''}"
+                   v-model="currentText.eng"
                    placeholder="Enter text">
             <h3>Translation</h3>
-            <input type="text" v-model="currentText.tn" placeholder="Enter translation">
+            <input type="text"
+                   :class="{'error': error && currentText.tn === ''}"
+                   v-model="currentText.tn"
+                   placeholder="Enter translation">
         </div>
         <main-button @click="addAndUpdate" class="btn-submit">submit</main-button>
     </modal-window>
@@ -76,7 +82,10 @@
         },
         methods: {
             addAndUpdate() {
-                if(this.currentText.eng === '' || this.currentText.tn === '') return;
+                if(this.currentText.eng === '' || this.currentText.tn === '') {
+                    this.error = true;
+                    return;
+                }
                 const item = this.currentText;
                 this.createUpdateItem(item);
 
@@ -126,6 +135,23 @@
         margin-top: 10px;
     }
 
+    .btn.download {
+        margin: 0 auto 0 20px;
+    }
+
+    h1.scroll {
+        position: fixed;
+        top: 0;
+        z-index: 100;
+        margin: 12px 0;
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    h1.scroll + .sap {
+        padding-top: 93px;
+    }
+
 
     .add-search {
         width: 100%;
@@ -134,7 +160,17 @@
         justify-content: space-between;
         align-items: center;
     }
-
+    .add-search.scroll {
+        position: fixed;
+        top: 0;
+        max-width: 1430px;
+        z-index: 99;
+        padding: 20px 0;
+        background: var(--white);
+    }
+    .add-search.scroll ~ div {
+        padding-top: 52px;
+    }
     .add-search input {
         margin-bottom: 0;
         height: 34px;
@@ -148,5 +184,16 @@
         max-width: 1430px;
         width: 100%;
         margin: 50px auto 0;
+    }
+
+    @media screen and (max-width: 1440px) {
+        .sap {
+            max-width: 1280px;
+        }
+    }
+
+    input.error {
+        border: 1px solid #ff0000;
+        box-shadow: 0 0 10px -3px #ff0000;
     }
 </style>

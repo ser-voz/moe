@@ -1,5 +1,6 @@
 import {defineStore} from 'pinia'
 import getters from "@/store/getters/getters";
+import {downloadData} from "@/store/downloadFile";
 
 export const vocStore = defineStore('vocabulary', {
     state: () => {
@@ -191,7 +192,8 @@ export const vocStore = defineStore('vocabulary', {
         delete(item) {
             let index = this.list.findIndex(el => el._id === item._id);
             this.list.splice(index, 1);
-        }
+        },
+        downloadData,
     }
 })
 

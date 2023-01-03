@@ -44,6 +44,7 @@ export default {
             if (!this.user.remember) {
                 this.store.setLocal(this.user.name)
                 this.$router.push({name: 'home'});
+
             }
 
         },

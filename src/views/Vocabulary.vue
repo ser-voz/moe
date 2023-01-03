@@ -1,10 +1,11 @@
 <template>
-    <h1>Vocabulary</h1>
+    <h1 v-scroll="138">Vocabulary</h1>
 
     <div class="vocabulary">
         <template v-if="!preloader && store.list.length > 0">
-            <div class="add-search">
+            <div class="add-search" v-scroll="220">
                 <main-button @click="modalVisible = !modalVisible, isEdit = false">Add new</main-button>
+                <main-button @click="store.downloadData(store.list, store.$id)" class="download">Download</main-button>
                 <input type="text" v-model="store.search" placeholder="Search...">
             </div>
 
@@ -36,9 +37,9 @@
         <h2 v-else>Add a new word</h2>
         <div>
             <h3>Word</h3>
-            <input required v-model="newWordFields.eng"  type="text" placeholder="English word">
+            <input required v-model="newWordFields.eng" :class="{'error': error && newWordFields.eng === ''}" type="text" placeholder="English word">
             <input required v-model="newWordFields.transcription" type="text" placeholder="Transcription">
-            <input required v-model="newWordFields.tn" type="text" placeholder="Translation">
+            <input required v-model="newWordFields.tn" :class="{'error': error && newWordFields.tn === ''}" type="text" placeholder="Translation">
             <div class="other_translation__input">
                 <input v-model="newWordFields.otherTranslation" type="text" placeholder="Other translation">
             </div>
@@ -83,6 +84,7 @@
                 preloader: true,
                 isEdit: false,
                 newFields: [],
+                error: false,
                 newWordFields: {
                     eng: '',
                     transcription: '',
@@ -103,8 +105,10 @@
             },
             addNewWord() {
                 //Check for required field
-                if(this.newWordFields.eng === '' || this.newWordFields.transcription === '' ||
-                    this.newWordFields.tn === '') return;
+                if(this.newWordFields.eng === '' || this.newWordFields.tn === '') {
+                    this.error = true;
+                    return;
+                }
 
                 //create arr and obj for new item and additional fields
                 let sentencesNew = [];
@@ -151,6 +155,7 @@
                 this.isEdit = false;
             },
 
+
         },
         mounted() {
             this.store.getFromLocal(this.authStatus);
@@ -178,16 +183,37 @@
         width: 100%;
         margin-top: 10px;
     }
+    .btn.download {
+        margin: 0 auto 0 20px;
+    }
+
+    h1.scroll {
+        position: fixed;
+        top: 0;
+        z-index: 100;
+        margin: 12px 0;
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    h1.scroll + .vocabulary {
+        padding-top: 93px;
+    }
 
     .vocabulary {
         display: flex;
         flex-wrap: wrap;
         max-width: 1430px;
         width: 100%;
-        margin: 0 auto 0;
+        margin: 50px auto 0;
         justify-content: space-between;
-    }
 
+    }
+    @media screen and (max-width: 1440px) {
+        .vocabulary {
+            max-width: 1280px;
+        }
+    }
     .vocabulary__list {
         display: flex;
         flex-direction: column;
@@ -201,6 +227,17 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    .add-search.scroll {
+        position: fixed;
+        top: 0;
+        max-width: 1430px;
+        z-index: 99;
+        padding: 20px 0;
+        background: var(--white);
+    }
+    .add-search.scroll ~ div {
+        padding-top: 52px;
     }
     .add-search input {
         margin-bottom: 0;
@@ -258,4 +295,8 @@
         width: 100%;
     }
 
+    input.error {
+        border: 1px solid #ff0000;
+        box-shadow: 0 0 10px -3px #ff0000;
+    }
 </style>

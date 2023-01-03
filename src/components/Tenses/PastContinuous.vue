@@ -6,10 +6,10 @@
         <div class="div3">Use</div>
         <div class="div16">Signal words</div>
         <div class="div4">
-            Present Continuous
+            Past Continuous
         </div>
         <div class="div5">
-            to be (am/are/is) + <span class="inf">infinitive </span> &nbsp;+&nbsp;<span class="end">-ing </span><br/>
+            was/were + <span class="inf">infinitive </span> &nbsp;+&nbsp;<span class="end">-ing </span><br/>
         </div>
         <div class="div6">
             <table class="ec-table">
@@ -27,74 +27,94 @@
                 <tr>
                     <th rowspan="2">+</th>
                     <td>I</td>
-                    <td class="bg-accent-1">am</td>
+                    <td class="bg-accent-1">was</td>
                     <td>&nbsp;</td>
-                    <td class="bg-accent-3">speaking</td>
-                    <td>to you.</td>
+                    <td class="bg-accent-3">watching</td>
+                    <td>TV.</td>
                 </tr>
                 <tr>
                     <td>You</td>
-                    <td class="bg-accent-1">are</td>
+                    <td class="bg-accent-1">were</td>
                     <td>&nbsp;</td>
-                    <td class="bg-accent-3">reading</td>
-                    <td>this.</td>
+                    <td class="bg-accent-3">working</td>
+                    <td>hard.</td>
                 </tr>
                 <tr>
                     <th rowspan="2">-</th>
                     <td>She, he, it</td>
-                    <td class="bg-accent-1">is</td>
+                    <td class="bg-accent-1">was</td>
                     <td>not</td>
-                    <td class="bg-accent-3">staying</td>
-                    <td>in London.</td>
+                    <td class="bg-accent-3">helping</td>
+                    <td>Mary.</td>
                 </tr>
                 <tr>
                     <td>We, they</td>
-                    <td class="bg-accent-1">are</td>
+                    <td class="bg-accent-1">were</td>
                     <td>not</td>
-                    <td class="bg-accent-3">playing</td>
-                    <td>football.</td>
+                    <td class="bg-accent-3">joking.</td>
+                    <td>&nbsp;</td>
                 </tr>
                 <tr>
                     <th rowspan="2">?</th>
-                    <td class="bg-accent-1">Is</td>
+                    <td class="bg-accent-1">Was</td>
                     <td>you</td>
                     <td>&nbsp;</td>
-                    <td class="bg-accent-3">watching</td>
-                    <td>TV?</td>
+                    <td class="bg-accent-3">being</td>
+                    <td>silly?</td>
                 </tr>
                 <tr>
-                    <td class="bg-accent-1">Are</td>
+                    <td class="bg-accent-1">Were</td>
                     <td>they</td>
                     <td>&nbsp;</td>
-                    <td class="bg-accent-3">waiting</td>
-                    <td>for John?</td>
+                    <td class="bg-accent-3">playing</td>
+                    <td>football?</td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="div9 use">
             <ul>
-                <li>something is happening at the same time of speaking or around it </li>
-                <li>future meaning: when you have already decided and arranged to do it (a fixed plan, date)</li>
+                <li>an action happened in the middle of another action</li>
+                <li>someone was doing sth. at a certain time (in the past) - you do not know whether it was finished or not</li>
             </ul>
         </div>
         <div class="div17 signal-words">
             <ul>
-                <li>now</li>
-                <li>at the moment</li>
-                <li>Look!</li>
-                <li>Listen!</li>
+                <li>while</li>
             </ul>
+        </div>
+    </div>
+    <br>
+    <div v-if="examples" class="examples">
+        <h2>Examples:</h2>
+        <div>
+            <small v-if="examples?.passive">Active voice</small>
+            <ol class="active-voice">
+                <li v-for="item in examples.active">
+                    {{ item }}
+                </li>
+            </ol>
+        </div>
+        <div v-if="examples?.passive">
+            <small>Passive voice</small>
+            <ol class="passive-voice">
+                <li v-for="item in examples.passive">
+                    {{ item }}
+                </li>
+            </ol>
         </div>
     </div>
 </template>
 
 <script>
     export default {
-        name: "PresentContinuous",
+        name: "PastContinuous",
         props: {
             description: {
                 type: String,
+            },
+            examples: {
+                type: Object
             }
         }
     }

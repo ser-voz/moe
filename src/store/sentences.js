@@ -1,5 +1,6 @@
 import {defineStore} from "pinia";
 import getters from "@/store/getters/getters";
+import {downloadData} from "@/store/downloadFile";
 
 export const senStore = defineStore('sentences', {
     state: () => {
@@ -77,6 +78,7 @@ export const senStore = defineStore('sentences', {
             let index = this.list.findIndex(el => el._id === item._id);
             this.list.splice(index, 1);
         },
+        downloadData
     }
 })
 

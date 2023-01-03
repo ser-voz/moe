@@ -83,6 +83,11 @@
             <ul>
                 <li>tomorrow</li>
                 <li>next year</li>
+                <li>later</li>
+                <li>as soon as</li>
+                <li>in three days</li>
+                <li>soon</li>
+                <li>tonight</li>
             </ul>
         </div>
     </div>

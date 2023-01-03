@@ -76,6 +76,7 @@
             <ul>
                 <li>you say that sth. has happened or is finished in the past and it has a connection to the present</li>
                 <li>action started in the past and continues up to the present</li>
+                <li>completed action in the present</li>
             </ul>
         </div>
         <div class="div17 signal-words">
@@ -93,6 +94,25 @@
             </ul>
         </div>
     </div>
+    <div v-if="examples" class="examples">
+        <h2>Examples:</h2>
+        <div>
+            <small v-if="examples?.passive">Active voice</small>
+            <ol class="active-voice">
+                <li v-for="item in examples.active">
+                    {{ item }}
+                </li>
+            </ol>
+        </div>
+        <div v-if="examples?.passive">
+            <small>Passive voice</small>
+            <ol class="passive-voice">
+                <li v-for="item in examples.passive">
+                    {{ item }}
+                </li>
+            </ol>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -101,8 +121,11 @@
         props: {
             description: {
                 type: String,
+            },
+            examples: {
+                type: Object
             }
-        }
+        },
     }
 </script>
 

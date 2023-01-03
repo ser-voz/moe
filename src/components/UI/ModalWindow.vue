@@ -31,7 +31,7 @@
         right: 0;
         bottom: 0;
         background: var(--overlay);
-        position: absolute;
+        position: fixed;
         display: flex;
         z-index: 999;
     }

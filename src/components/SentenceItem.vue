@@ -1,11 +1,12 @@
 <template>
     <div class="sap__item">
-        <div>
+        <div class="eng" @click="speechWord(data.eng)">
             {{ data.eng }}
         </div>
         <div class="sap__translation">
             {{ data.tn }}
         </div>
+
         <div class="sap__item-more" >
             <div>
                 <small @click="$emit('delete', data)">Delete</small>
@@ -23,12 +24,25 @@
                 type: Object,
                 default: false
             },
+        },
+        methods: {
+            speechWord(val) {
+                const speech = new SpeechSynthesisUtterance();
+                speech.lang = 'en-En';
+                speech.volume = 3;
+                speech.text = val;
+                window.speechSynthesis.speak(speech);
+            }
         }
 
     }
 </script>
 
 <style scoped>
+    .eng {
+        cursor: pointer;
+        display: inline-block;
+    }
     .sap__item {
         font-size: 24px;
         font-weight: 500;
@@ -41,6 +55,11 @@
         border-radius: 5px;
         box-shadow: var(--boxshadow);
         position: relative;
+    }
+    @media screen and (max-width: 1440px) {
+        .sap__item {
+            min-width: 630px;
+        }
     }
     .sap__item div:first-child {
         font-weight: 600;

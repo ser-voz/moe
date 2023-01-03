@@ -17,12 +17,12 @@
     import '@/assets/style.module.css'
     import MenuPage from "./views/MenuPage";
 
-
     export default {
         components: {MenuPage},
         setup() {
             const getUser = authStore();
             getUser.getCookie();
+
             return {getUser};
         },
         computed: {
@@ -30,6 +30,7 @@
                 return this.$route.path !== '/';
             },
         },
+
         methods: {
             logOut() {
                 localStorage.removeItem('vocabulary');
@@ -39,9 +40,10 @@
                 });
                 window.location.href = '/';
             }
-        }
+        },
     }
 </script>
+
 <style>
     html {
         --black:     #202124;
@@ -106,6 +108,7 @@
         position: absolute;
         right: 50px;
         top: -85%;
+        padding: 0 calc(5px - (100vw - 100%)) 0 0;
     }
 
     .darkMode input:focus {
@@ -147,6 +150,7 @@
         top: 30px;
         text-align: center;
         background: var(--white);
+        padding: 0 calc(5px - (100vw - 100%)) 0 0;
     }
 
     .main-menu a,

@@ -2,9 +2,10 @@ const { defineConfig } = require('@vue/cli-service');
 
 module.exports = defineConfig({
     devServer: {
-        proxy: 'http://192.168.1.120:3000',
+        //proxy: 'http://localhost:8080'
+        //host: "localhost"
     },
-    publicPath: process.env.NODE_ENV === "production" ? "/moe/" : "/",
+    publicPath: process.env.NODE_ENV === "production" ? "/moe/" : "/moe/",
     transpileDependencies: true,
 });
 

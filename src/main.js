@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 
 import components from './components/UI'
+import ScrollTop from "@/directives/ScrollTop";
 
 
 const pinia = createPinia();
@@ -13,6 +14,6 @@ components.forEach(component => {
     app.component(component.name, component);
 });
 
-app.use(pinia).use(router).mount('#app');
+app.use(pinia).use(router).directive('scroll',ScrollTop).mount('#app');
 
 

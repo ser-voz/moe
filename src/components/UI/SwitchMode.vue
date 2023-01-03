@@ -22,7 +22,7 @@
         },
         mounted() {
             const mode = JSON.parse(localStorage.getItem('modeStatus'));
-            this.darkMode = mode;
+            mode ? this.darkMode = mode : window.localStorage.setItem('modeStatus', this.darkMode);
         },
 
     }
